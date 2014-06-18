@@ -43,7 +43,6 @@ def __main__():
 	player2turn = pygame.image.load('media/player2turn.png')
 	cputurn = pygame.image.load('media/cputurn.png')
 	ggwpnore = pygame.image.load('media/ggwpnore.png')
-	#TODO set replay location
 
 	#clickable tile locations
 	tiles = [[0 for x in range(3)] for x in range(3)]
@@ -272,4 +271,5 @@ def checkdraw():
 				return False
 	return True
 
-__main__()
+if __name__ == '__main__':
+	__main__()
