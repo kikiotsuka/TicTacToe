@@ -97,6 +97,8 @@ def __main__():
 			elif cpu:
 				window.blit(player1turn, (5, 508))
 				window.blit(cputurn, (500 / 2 + 5, 508))
+				if not turn: #cpu makes move
+					pass
 			#draw pieces
 			for i, bl in enumerate(board):
 				for j, b in enumerate(bl):
