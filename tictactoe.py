@@ -40,11 +40,12 @@ def __main__():
 	player1turn = pygame.image.load('media/player1turn.png')
 	player2turn = pygame.image.load('media/player2turn.png')
 	cputurn = pygame.image.load('media/cputurn.png')
+	ggwpnore = pygame.image.load('media/ggwpnore.png')
 	#TODO set replay location
 
 	#clickable tile locations
 	tiles = [[0 for x in range(3)] for x in range(3)]
-	print(len(tiles))
+	#print(len(tiles))
 	i=j=0
 	for x in range(0, 500 - 10, 500 // 3):
 		for y in range(0, 500 - 10, 500 // 3):
@@ -104,7 +105,17 @@ def __main__():
 					elif b == 'o':
 						window.blit(oimg, tiles[i][j])
 		elif gameover:
-			window.fill(WHITE)
+			window.fill(BLACK)
+			for tl in tiles:
+				for t in tl:
+					pygame.draw.rect(window, WHITE, t)
+			pygame.draw.rect(window, WHITE, turnbox)
+			for i, bl in enumerate(board):
+				for j, b in enumerate(bl):
+					if b == 'x':
+						window.blit(ximg, tiles[i][j])
+					elif b == 'o':
+						window.blit(oimg, tiles[i][j])
 			if winstate == 1: #someone won
 				if twoplayer:
 					if not turn: #player1 won
@@ -119,6 +130,7 @@ def __main__():
 			else: #cat's game
 				window.blit(draw, (250 - draw.get_width() / 2, 100))
 			window.blit(replay.img, replay.loc)
+			window.blit(ggwpnore, (0, 503))
 
 		#events
 		for event in pygame.event.get():
@@ -139,7 +151,7 @@ def __main__():
 						menu = False
 						playing = True
 						board = [[0 for x in range(3)] for x in range(3)]
-						turn = True if randint(0, 1) == 0 else False
+						turn = turn if turn != None else True if randint(0, 1) == 0 else False
 						winstate = 0
 				elif playing:
 					if cpu and not turn:
@@ -186,7 +198,8 @@ def horz():
 
 def vert():
 	for x in range(0, 3):
-		if board[0][x]==board[1][x]==board[2][x]!=0:
+		arr = [board[j][x] for j in range(3)]
+		if len(set(arr)) == 1 and 0 not in set(arr):
 			return True
 	return False
 
