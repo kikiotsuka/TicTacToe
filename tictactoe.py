@@ -21,24 +21,25 @@ def __main__():
 	fpsClock = pygame.time.Clock()
 
 	window = pygame.display.set_mode((500, 600))
-	pygame.display.set_caption('Tic Tac Toe')
+	pygame.display.set_caption('Tic Tac Toe by Mitsuru Otsuka')
 
 	#images
-	oimg = pygame.image.load('o.png')
-	ximg = pygame.image.load('x.png')
-	cpubutton = Button(pygame.image.load('cpu.png'))
+	oimg = pygame.image.load('media/o.png')
+	ximg = pygame.image.load('media/x.png')
+	cpubutton = Button(pygame.image.load('media/cpu.png'))
 	cpubutton.setloc((250 - cpubutton.dim[0] / 2, 500 // 3 * 2 - cpubutton.dim[1] / 2))
-	twoplayerbutton = Button(pygame.image.load('twoplayer.png'))
+	twoplayerbutton = Button(pygame.image.load('media/twoplayer.png'))
 	twoplayerbutton.setloc((250 - twoplayerbutton.dim[0] / 2, 
 							500 // 3 - twoplayerbutton.dim[1] / 2))
-	cpuwin = pygame.image.load('cpuwin.png')
-	player1win = pygame.image.load('player1win.png')
-	player2win = pygame.image.load('player2win.png')
-	draw = pygame.image.load('draw.png')
-	replay = Button(pygame.image.load('replay.png'), (0, 0))
-	player1turn = pygame.image.load('player1turn.png')
-	player2turn = pygame.image.load('player2turn.png')
-	cputurn = pygame.image.load('cputurn.png')
+	cpuwin = pygame.image.load('media/cpuwin.png')
+	player1win = pygame.image.load('media/player1win.png')
+	player2win = pygame.image.load('media/player2win.png')
+	draw = pygame.image.load('media/draw.png')
+	replay = Button(pygame.image.load('media/replay.png'))
+	replay.setloc((250 - replay.dim[0] / 2, 300))
+	player1turn = pygame.image.load('media/player1turn.png')
+	player2turn = pygame.image.load('media/player2turn.png')
+	cputurn = pygame.image.load('media/cputurn.png')
 	#TODO set replay location
 
 	#clickable tile locations
@@ -65,19 +66,21 @@ def __main__():
 	gameover = False
 	twoplayer = False
 	cpu = False
+	winstate = 0
 
 	board = None
 	turn = None
 	turnboxindicator = []
 	turnboxindicator.append(Rect(0, 503, 250, 97))
 	turnboxindicator.append(Rect(250, 503, 500, 97))
+
 	while True: #game loop
-		window.fill(BLACK)
 		if menu:
 			window.fill(WHITE)
 			window.blit(twoplayerbutton.img, twoplayerbutton.loc)
 			window.blit(cpubutton.img, cpubutton.loc)
 		elif playing:
+			window.fill(BLACK)
 			#draw tiles
 			for tl in tiles:
 				for t in tl:
@@ -93,8 +96,29 @@ def __main__():
 			elif cpu:
 				window.blit(player1turn, (5, 508))
 				window.blit(cputurn, (500 / 2 + 5, 508))
+			#draw pieces
+			for i, bl in enumerate(board):
+				for j, b in enumerate(bl):
+					if b == 'x':
+						window.blit(ximg, tiles[i][j])
+					elif b == 'o':
+						window.blit(oimg, tiles[i][j])
 		elif gameover:
-			pass
+			window.fill(WHITE)
+			if winstate == 1: #someone won
+				if twoplayer:
+					if not turn: #player1 won
+						window.blit(player1win, (250 - player1win.get_width() / 2, 100))
+					else: #player 2 won
+						window.blit(player2win, (250 - player2win.get_width() / 2, 100))
+				else:
+					if not turn: #player 1 won
+						window.blit(player1win, (250 - player1win.get_width() / 2, 100))
+					else: #cpu won
+						window.blit(cpuwin, (250 - cpuwin.get_width() / 2, 100))
+			else: #cat's game
+				window.blit(draw, (250 - draw.get_width() / 2, 100))
+			window.blit(replay.img, replay.loc)
 
 		#events
 		for event in pygame.event.get():
@@ -104,23 +128,30 @@ def __main__():
 			elif event.type == MOUSEBUTTONUP:
 				mouseloc = event.pos
 				if menu:
+					trigger = False
 					if twoplayerbutton.clicked(mouseloc):
-						menu = False
+						trigger = True
 						twoplayer = True
+					elif cpubutton.clicked(mouseloc):
+						trigger = True
+						cpu = True
+					if trigger:
+						menu = False
 						playing = True
 						board = [[0 for x in range(3)] for x in range(3)]
 						turn = True if randint(0, 1) == 0 else False
-					elif cpubutton.clicked(mouseloc):
-						menu = False
-						cpu = True
-						playing = True
-						turn = True if randint(0, 1) == 0 else False
+						winstate = 0
 				elif playing:
+					if cpu and not turn:
+						continue
 					for i, tl in enumerate(tiles):
 						for j, t in enumerate(tl):
 							if t.collidepoint(mouseloc):
-								makemove(i, j)
-								print(str(i) + ' ' + str(j))
+								winstate = makemove(i, j)
+								#print(str(i) + ' ' + str(j))
+								if winstate == 1 or winstate == 2:
+									playing = False
+									gameover = True
 				else:
 					if replay.clicked(mouseloc):
 						menu = True
