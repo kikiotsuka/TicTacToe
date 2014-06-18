@@ -16,7 +16,7 @@ class Button:
 		return self.box.collidepoint(loc)
 
 def __main__():
-	global board, turn
+	global board, turn, cpumove
 	pygame.init()
 	fpsClock = pygame.time.Clock()
 
@@ -75,6 +75,8 @@ def __main__():
 	turnboxindicator.append(Rect(0, 503, 250, 97))
 	turnboxindicator.append(Rect(250, 503, 500, 97))
 
+	cpumove = None
+
 	while True: #game loop
 		if menu:
 			window.fill(WHITE)
@@ -98,7 +100,11 @@ def __main__():
 				window.blit(player1turn, (5, 508))
 				window.blit(cputurn, (500 / 2 + 5, 508))
 				if not turn: #cpu makes move
-					pass
+					cpucalculatemove(0)
+					winstate = makemove(*cpumove)
+					if winstate == 1 or winstate == 2:
+						playing = False
+						gameover = True
 			#draw pieces
 			for i, bl in enumerate(board):
 				for j, b in enumerate(bl):
@@ -155,6 +161,10 @@ def __main__():
 						board = [[0 for x in range(3)] for x in range(3)]
 						turn = turn if turn != None else True if randint(0, 1) == 0 else False
 						winstate = 0
+					if cpu:
+						if not turn:
+							turn = not turn
+							board[0][0] = 'o'
 				elif playing:
 					if cpu and not turn:
 						continue
@@ -174,6 +184,41 @@ def __main__():
 						twoplayer = False
 		pygame.display.update()
 		fpsClock.tick(60)
+
+def cpucalculatemove(depth):
+	global cpumove
+	if checkwin():
+		return -1000
+	if checkdraw():
+		return 0
+	maxval = -999
+	for i in range(3):
+		for j in range(3):
+			if board[i][j] == 0:
+				board[i][j] = 'o'
+				ans = playercalculatemove(depth + 1)
+				board[i][j] = 0
+				if ans > maxval:
+					maxval = ans
+					if depth == 0:
+						cpumove = (i, j)
+	return maxval
+
+def playercalculatemove(depth):
+	if checkwin():
+		return 1000
+	if checkdraw():
+		return 0
+	minval = 999
+	for i in range(3):
+		for j in range(3):
+			if board[i][j] == 0:
+				board[i][j] = 'x'
+				ans = cpucalculatemove(depth + 1)
+				board[i][j] = 0
+				if ans < minval:
+					minval = ans
+	return minval
 
 def makemove(i, j):
 	global board, turn
