@@ -26,11 +26,13 @@ def __main__():
 	#images
 	oimg = pygame.image.load('media/o.png')
 	ximg = pygame.image.load('media/x.png')
-	cpubutton = Button(pygame.image.load('media/cpu.png'))
-	cpubutton.setloc((250 - cpubutton.dim[0] / 2, 500 // 3 * 2 - cpubutton.dim[1] / 2))
 	twoplayerbutton = Button(pygame.image.load('media/twoplayer.png'))
 	twoplayerbutton.setloc((250 - twoplayerbutton.dim[0] / 2, 
-							500 // 3 - twoplayerbutton.dim[1] / 2))
+							600 // 3.5 - twoplayerbutton.dim[1] / 2 - 50))
+	cpubutton = Button(pygame.image.load('media/cpu.png'))
+	cpubutton.setloc((250 - cpubutton.dim[0] / 2, 600 // 3.5 * 2 - cpubutton.dim[1] / 2 - 50))
+	quitbutton = Button(pygame.image.load('media/quit.png'))
+	quitbutton.setloc((250 - quitbutton.dim[0] / 2, 600 // 3.5 * 3 - quitbutton.dim[1] / 2 - 50))
 	cpuwin = pygame.image.load('media/cpuwin.png')
 	player1win = pygame.image.load('media/player1win.png')
 	player2win = pygame.image.load('media/player2win.png')
@@ -82,6 +84,7 @@ def __main__():
 			window.fill(WHITE)
 			window.blit(twoplayerbutton.img, twoplayerbutton.loc)
 			window.blit(cpubutton.img, cpubutton.loc)
+			window.blit(quitbutton.img, quitbutton.loc)
 		elif playing:
 			window.fill(BLACK)
 			#draw tiles
@@ -155,6 +158,9 @@ def __main__():
 					elif cpubutton.clicked(mouseloc):
 						trigger = True
 						cpu = True
+					elif quitbutton.clicked(mouseloc):
+						pygame.quit()
+						sys.exit()
 					if trigger:
 						menu = False
 						playing = True
